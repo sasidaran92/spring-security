@@ -13,20 +13,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
+        http.authorizeRequests()
+                .antMatchers("/admin").hasRole("ADMIN")
+                .antMatchers("/user").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/").authenticated()
+                .and().formLogin();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-       // super.configure(auth);
+        // super.configure(auth);
         auth.inMemoryAuthentication()
                 .withUser("test")
                 .password("test")
-                .roles("USER");
+                .roles("USER")
+                .and()
+                .withUser("admin")
+                .password("admin")
+                .roles("ADMIN");
     }
 
     @Bean
-    public PasswordEncoder getPasswordEncoder(){
+    public PasswordEncoder getPasswordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
 }
